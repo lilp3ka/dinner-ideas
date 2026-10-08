@@ -1,3 +1,6 @@
+"use client";
+
+import { useTranslations } from "next-intl";
 import type { Dish } from "@/lib/prompt";
 
 interface IdeaCardProps {
@@ -7,13 +10,15 @@ interface IdeaCardProps {
 }
 
 export default function IdeaCard({ dish, isFavorite, onToggleFavorite }: IdeaCardProps) {
+  const t = useTranslations();
+
   const meta = [
-    `${dish.cookTimeMinutes} мин`,
-    `${dish.servings} ${dish.servings === 1 ? "порция" : "порции"}`,
+    `${dish.cookTimeMinutes} ${t("minutesShort")}`,
+    `${dish.servings} ${dish.servings === 1 ? t("servingWord") : t("servingsWord")}`,
     dish.cuisine,
   ];
   if (dish.calories !== null) {
-    meta.push(`${dish.calories} ккал`);
+    meta.push(`${dish.calories} ${t("caloriesShort")}`);
   }
 
   return (
@@ -32,7 +37,7 @@ export default function IdeaCard({ dish, isFavorite, onToggleFavorite }: IdeaCar
           <button
             type="button"
             onClick={onToggleFavorite}
-            aria-label={isFavorite ? "Убрать из избранного" : "Добавить в избранное"}
+            aria-label={isFavorite ? t("removeFavoriteLabel") : t("addFavoriteLabel")}
             className="flex-shrink-0 text-xl leading-none mt-1 transition-transform hover:scale-110"
           >
             {isFavorite ? "❤️" : "🤍"}
@@ -44,14 +49,14 @@ export default function IdeaCard({ dish, isFavorite, onToggleFavorite }: IdeaCar
         </p>
 
         <div className="border-t border-line pt-4">
-          <h4 className="font-medium text-ink text-sm mb-2">Ингредиенты</h4>
+          <h4 className="font-medium text-ink text-sm mb-2">{t("ingredientsSectionTitle")}</h4>
           <p className="text-sm text-ink-soft leading-relaxed">
             {dish.ingredients.join(", ")}
           </p>
         </div>
 
         <div className="border-t border-line pt-4">
-          <h4 className="font-medium text-ink text-sm mb-2">Приготовление</h4>
+          <h4 className="font-medium text-ink text-sm mb-2">{t("stepsSectionTitle")}</h4>
           <ol className="space-y-2.5">
             {dish.steps.map((step, i) => (
               <li key={i} className="text-sm text-ink-soft flex gap-3">

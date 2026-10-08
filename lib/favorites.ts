@@ -5,6 +5,7 @@ const STORAGE_KEY = "dinner-ideas:favorites";
 export interface FavoriteDish extends Dish {
   id: string;
   savedAt: number;
+  language: string;
 }
 
 
@@ -31,7 +32,7 @@ try {
 } 
 }
 
-export function addFavorite(dish: Dish): FavoriteDish[] {
+export function addFavorite(dish: Dish, language: string): FavoriteDish[] {
   const favorites = getFavorites();
   const id = getDishId(dish);
 
@@ -39,7 +40,7 @@ export function addFavorite(dish: Dish): FavoriteDish[] {
     return favorites
   }
 
-  const updated = [...favorites, {...dish, id, savedAt: Date.now()}];
+  const updated = [...favorites, {...dish, id, savedAt: Date.now(), language}];
   saveFavorites(updated);
   return updated;
   }

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, type SubmitEvent, type KeyboardEvent } from "react";
+import { useTranslations } from "next-intl";
 import type { IdeaRequestParams } from "@/lib/prompt";
 
 interface IdeaFormProps {
@@ -9,6 +10,8 @@ interface IdeaFormProps {
 }
 
 export default function IdeaForm({ onSubmit, isLoading }: IdeaFormProps) {
+  const t = useTranslations();
+
   const [ingredients, setIngredients] = useState<string[]>([]);
   const [inputValue, setInputValue] = useState("");
   const [cuisine, setCuisine] = useState("");
@@ -55,7 +58,7 @@ export default function IdeaForm({ onSubmit, isLoading }: IdeaFormProps) {
     >
       <div>
         <label className="block text-sm font-medium text-ink mb-2">
-          Что у Вас есть в холодильнике?
+          {t("ingredientsLabel")}
         </label>
         <div className="flex gap-2">
           <input
@@ -63,7 +66,7 @@ export default function IdeaForm({ onSubmit, isLoading }: IdeaFormProps) {
             value={inputValue}
             onChange={(e) => setInputValue(e.target.value)}
             onKeyDown={handleKeyDown}
-            placeholder="Например: курица, рис, огурцы..."
+            placeholder={t("ingredientsPlaceholder")}
             className="flex-1 border border-line bg-paper rounded-lg px-3 py-2 text-sm text-ink placeholder:text-ink-soft/50 focus:outilne-none focus:ring-2 focus:ring-saffron"
           />
           <button
@@ -71,14 +74,16 @@ export default function IdeaForm({ onSubmit, isLoading }: IdeaFormProps) {
             onClick={addIngredient}
             className="bg-ink text-paper px-4 py-2 rounded-lg text-sm hover:bg-ink/90 transition-colors"
           >
-            Добавить
+            {t("addButton")}
           </button>
         </div>
 
         {ingredients.length > 0 && (
           <div className="flex flex-wrap gap-2 mt-3">
             {ingredients.map((ingredient) => (
-              <span key={ingredient} className="bg-herb/10 text-herb text-sm px-3 py-1 rounded-full flex items-center gap-1.5 border border-herb/20">
+              <span 
+                key={ingredient} 
+                className="bg-herb/10 text-herb text-sm px-3 py-1 rounded-full flex items-center gap-1.5 border border-herb/20">
                 {ingredient}
                 <button
                   type="button"
@@ -97,33 +102,33 @@ export default function IdeaForm({ onSubmit, isLoading }: IdeaFormProps) {
       <div className="grid grid-cols-2 gap-4">
         <div>
           <label className="block text-sm font-medium text-ink mb-1.5">
-            Кухня ( необязательно )
+            {t("cuisineLabel")}
           </label>
           <input
             type="text"
             value={cuisine}
             onChange={(e) => setCuisine(e.target.value)}
-            placeholder="Итальянская, азиатская..."
+            placeholder={t("cuisinePlaceholder")}
             className="w-full border border-line bg-paper rounded-lg px-3 py-2 text-sm text-ink placeholder:text-ink-soft/50 focus:oultine-none focus:ring-2 focus:ring-saffron"
           />
         </div>
 
         <div>
           <label className="block text-sm font-medium text-ink mb-1.5">
-            Диета ( необязательно )
+            {t("dietLabel")}
           </label>
           <input
             type="text"
             value={diet}
             onChange={(e) => setDiet(e.target.value)}
-            placeholder="Вегетарианская, без глютена..."
+            placeholder={t("dietPlaceholder")}
             className="w-full border border-line bg-paper rounded-lg px-3 py-2 text-sm text-ink placeholder:text-ink-soft/50 focus:outline-none focus:ring-2 focus:ring-saffron"
           />
         </div>
 
         <div>
           <label className="block text-sm font-medium text-ink mb-1.5">
-            Время готовки: {maxCookTime} мин
+            {t("cookTimeLabel")}: {maxCookTime} {t("minutesShort")}
           </label>
           <input
             type="range"
@@ -138,7 +143,7 @@ export default function IdeaForm({ onSubmit, isLoading }: IdeaFormProps) {
 
         <div>
           <label className="block text-sm font-medium text-ink mb-1.5">
-            Порций: {servings}
+            {t("servingsLabel")}: {servings}
           </label>
           <input
             type="range"
@@ -156,7 +161,7 @@ export default function IdeaForm({ onSubmit, isLoading }: IdeaFormProps) {
         disabled={ingredients.length === 0 || isLoading}
         className="bg-saffron text-paper font-medium py-3 rounded-lg hover:bg-saffron/90 transition-colors disabled:bg-line disabled:text-ink-soft disabled:cursor-not-allowed"
       >
-        {isLoading ? "Придумываю..." : "Предложить идеи ужина"}
+        {isLoading ? t("submitLoading") : t("submitButton")}
       </button>
     </form>
   );

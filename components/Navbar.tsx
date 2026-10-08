@@ -1,52 +1,57 @@
 "use client";
 
-import { useLanguage } from "@/lib/LanguageContext";
+import { useTranslations, useLocale } from "next-intl";
+import { useRouter, usePathname, Link } from "@/i18n/navigation";
+import { routing, localeLabels } from "@/i18n/routing";
 import { useTheme } from "@/lib/ThemeContext";
-import { languages } from "@/lib/translations";
 
 interface NavbarProps {
   favoritesCount: number;
-  showFavorites: boolean;
-  onToggleFavorites: () => void;
 }
 
-export default function Navbar({ favoritesCount, showFavorites, onToggleFavorites }: NavbarProps) {
-  const { language, setLanguage, t } = useLanguage();
+export default function Navbar({ favoritesCount }: NavbarProps) {
+  const t = useTranslations();
+  const locale = useLocale();
+  const router = useRouter();
+  const pathname = usePathname();
   const { theme, toggleTheme } = useTheme();
+
+  function handleLanguageChange(newLocale: string) {
+    router.replace(pathname, { locale: newLocale });
+  }
 
   return (
     <nav className="border-b border-line bg-paper-card">
       <div className="max-w-4xl mx-auto px-4 py-3 flex items-center justify-between gap-4">
-        <span className="font-display text-lg font-semibold text-ink">
+        <Link href="/" className="font-display text-lg font-semibold text-ink">
           🍳 {t("title")}
-        </span>
+        </Link>
 
         <div className="flex items-center gap-3">
-          {favoritesCount > 0 && (
-            <button
-              onClick={onToggleFavorites}
-              className="text-sm text-ink-soft hover:text-ink flex items-center gap-1.5"
-            >
-              {showFavorites ? "✕" : "❤️"} {t("favoritesButton")} ({favoritesCount})
-            </button>
-          )}
+          <Link
+            href="/favorites"
+            className="text-sm text-ink-soft hover:text-ink flex items-center gap-1.5"
+          >
+            ❤️ {t("favoritesButton")}
+            {favoritesCount > 0 && ` (${favoritesCount})`}
+          </Link>
 
           <select
-            value={language}
-            onChange={(e) => setLanguage(e.target.value as typeof language)}
+            value={locale}
+            onChange={(e) => handleLanguageChange(e.target.value)}
             className="text-sm bg-paper border border-line rounded-md px-2 py-1 text-ink cursor-pointer"
             aria-label="Language"
           >
-            {languages.map((lang) => (
-              <option key={lang.code} value={lang.code}>
-                {lang.label}
+            {routing.locales.map((code) => (
+              <option key={code} value={code}>
+                {localeLabels[code]}
               </option>
             ))}
           </select>
 
           <button
             onClick={toggleTheme}
-            aria-label={theme === "light" ? "Включить тёмную тему" : "Включить светлую тему"}
+            aria-label={theme === "light" ? "Dark mode" : "Light mode"}
             className="text-lg leading-none hover:scale-110 transition-transform"
           >
             {theme === "light" ? "🌑" : "☀️"}

@@ -6,7 +6,13 @@ import IdeaForm from "@/components/IdeaForm";
 import IdeaCard from "@/components/IdeaCard";
 import Navbar from "@/components/Navbar";
 import type { Dish, IdeaRequestParams } from "@/lib/prompt";
-import { getFavorites, addFavorite, removeFavorite, getDishId, type FavoriteDish } from "@/lib/favorites";
+import {
+  getFavorites,
+  addFavorite,
+  removeFavorite,
+  getDishId,
+  type FavoriteDish,
+} from "@/lib/favorites";
 
 export default function Home() {
   const t = useTranslations();
@@ -17,7 +23,6 @@ export default function Home() {
   const [error, setError] = useState<string | null>(null);
   const [lastParams, setLastParams] = useState<IdeaRequestParams | null>(null);
   const [favorites, setFavorites] = useState<FavoriteDish[]>([]);
-  const [showFavorites, setShowFavorites] = useState(false);
 
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect
@@ -66,24 +71,26 @@ export default function Home() {
     const id = getDishId(dish);
     const isAlreadyFavorite = favorites.some((f) => f.id === id);
 
-    const updated = isAlreadyFavorite ? removeFavorite(id) : addFavorite(dish);
+    const updated = isAlreadyFavorite ? removeFavorite(id) : addFavorite(dish, locale);
     setFavorites(updated);
   }
 
   return (
     <>
-      <Navbar
-        favoritesCount={favorites.length}
-        showFavorites={showFavorites}
-        onToggleFavorites={() => setShowFavorites((prev) => !prev)}
-      />
+      <Navbar favoritesCount={favorites.length} />
 
       <main className="min-h-screen py-12 px-4">
         <div className="max-w-4xl mx-auto flex flex-col gap-8">
           <header className="text-center">
-            <p className="text-xl text-ink-soft tracking-wide mb-4">{t("tagline")}</p>
-            <h1 className="font-display text-5xl font-semibold text-ink">{t("title")}</h1>
-            <p className="text-ink-soft mt-3 max-w-md mx-auto">{t("subtitle")}</p>
+            <p className="text-xl text-ink-soft tracking-wide mb-4">
+              {t("tagline")}
+            </p>
+            <h1 className="font-display text-5xl font-semibold text-ink">
+              {t("title")}
+            </h1>
+            <p className="text-ink-soft mt-3 max-w-md mx-auto">
+              {t("subtitle")}
+            </p>
           </header>
 
           <IdeaForm onSubmit={handleSubmit} isLoading={isLoading} />
@@ -95,7 +102,9 @@ export default function Home() {
           )}
 
           {isLoading && (
-            <div className="text-center text-ink-soft py-8">{t("loadingText")}</div>
+            <div className="text-center text-ink-soft py-8">
+              {t("loadingText")}
+            </div>
           )}
 
           {dishes.length > 0 && (
@@ -127,24 +136,7 @@ export default function Home() {
               <p className="text-sm">{t("emptyStateText")}</p>
             </div>
           )}
-
-          {showFavorites && favorites.length > 0 && (
-            <section className="border-t border-line pt-8">
-              <h2 className="font-display text-2xl font-semibold text-ink mb-5">
-                {t("favoritesButton")}
-              </h2>
-              <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {favorites.map((dish) => (
-                  <IdeaCard
-                    key={dish.id}
-                    dish={dish}
-                    isFavorite={true}
-                    onToggleFavorite={() => handleToggleFavorite(dish)}
-                  />
-                ))}
-              </div>
-            </section>
-          )}
+          
         </div>
       </main>
     </>

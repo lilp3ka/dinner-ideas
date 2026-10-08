@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { NextIntlClientProvider, hasLocale } from "next-intl";
+import { getMessages } from "next-intl/server";
 import { Cormorant_Garamond, Inter } from "next/font/google";
 import { routing } from "@/i18n/routing";
 import { ThemeProvider } from "@/lib/ThemeContext";
@@ -18,8 +19,8 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "Генератор идей для ужина",
-  description: "Подбор рецептов ужина на основе продуктов, которые есть под рукой",
+  title: "Dinner Idea Generator",
+  description: "AI-powered dinner ideas based on what you already have",
 };
 
 export function generateStaticParams() {
@@ -37,7 +38,9 @@ export default async function LocaleLayout({
 
   if (!hasLocale(routing.locales, locale)) {
     notFound();
-}
+  }
+
+  const messages = await getMessages();
 
   return (
     <html
@@ -46,7 +49,7 @@ export default async function LocaleLayout({
     >
       <body className="min-h-full flex flex-col">
         <ThemeProvider>
-          <NextIntlClientProvider>{children}</NextIntlClientProvider>
+          <NextIntlClientProvider messages={messages}>{children}</NextIntlClientProvider>
         </ThemeProvider>
       </body>
     </html>

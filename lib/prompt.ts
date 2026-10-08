@@ -24,10 +24,20 @@ export interface IdeaRequestParams {
   diet?: string;
   maxCookTime?: number;
   servings?: number;
+  language?: string;
 }
 
 export function buildPrompt(params: IdeaRequestParams): string {
-  const { ingredients, cuisine, diet, maxCookTime, servings } = params;
+  const { ingredients, cuisine, diet, maxCookTime, servings, language } = params;
+
+  const languageNames: Record<string, string> = {
+    ru: "руском",
+    uk: "украинском",
+    en: "английском",
+    zh: "китайском",
+    ja: "японском",
+  };
+  const languageName = languageNames[language ?? "ru"] ?? "русском";
 
   const constraints: string[] = [];
   if (cuisine) constraints.push(`Кухня: ${cuisine}.`);
@@ -36,7 +46,7 @@ export function buildPrompt(params: IdeaRequestParams): string {
     constraints.push(`Время готовки не больше: ${maxCookTime} минут.`);
   if (servings) constraints.push(`Количество порций: ${servings}.`);
 
-  return `Вы - кулинарный помощник. Придумайте 3 разных варианта ужина на основке списка продуктов, которые есть у пользователя.
+  return `Ты — кулинарный помощник. Придумай 3 разных варианта ужина на основе списка продуктов, которые есть у пользователя. Весь текст в ответе — названия блюд, описания, названия ингредиентов и шаги приготовления — напиши на ${languageName} языке, независимо от того, на каком языке дан список продуктов ниже.
 
   Доступные продукты: ${ingredients.join(", ")}.
   ${constraints.join(" ")}
