@@ -24,5 +24,6 @@
   "servingsWord": "servings",
   "caloriesShort": "kcal",
   "addFavoriteLabel": "Add to favorites",
-  "removeFavoriteLabel": "Remove from favorites"
+  "removeFavoriteLabel": "Remove from favorites",
+  "invalidTermError": "Doesn't look like a real option, try another word"
 }

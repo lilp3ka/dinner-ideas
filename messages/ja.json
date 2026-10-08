@@ -24,5 +24,6 @@
   "servingsWord": "人分",
   "caloriesShort": "kcal",
   "addFavoriteLabel": "お気に入りに追加",
-  "removeFavoriteLabel": "お気に入りから削除"
+  "removeFavoriteLabel": "お気に入りから削除",
+  "invalidTermError": "実在するものではないようです。別の言葉をお試しください"
 }

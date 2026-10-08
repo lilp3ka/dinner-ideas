@@ -24,5 +24,6 @@
   "servingsWord": "份",
   "caloriesShort": "千卡",
   "addFavoriteLabel": "加入收藏",
-  "removeFavoriteLabel": "取消收藏"
+  "removeFavoriteLabel": "取消收藏",
+  "invalidTermError": "这似乎不是一个真实的选项，请换个词试试"
 }

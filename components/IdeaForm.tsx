@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, type SubmitEvent, type KeyboardEvent } from "react";
+import { useState, type FormEvent, type KeyboardEvent } from "react";
 import { useTranslations } from "next-intl";
 import type { IdeaRequestParams } from "@/lib/prompt";
 
@@ -9,52 +9,105 @@ interface IdeaFormProps {
   isLoading: boolean;
 }
 
-export default function IdeaForm({ onSubmit, isLoading }: IdeaFormProps) {
-  const t = useTranslations();
+type Category = "ingredient" | "cuisine" | "diet";
 
-  const [ingredients, setIngredients] = useState<string[]>([]);
+function useTagInput(
+  category: Category,
+  invalidMessage: string,
+  initial: string[] = [],
+) {
+  const [tags, setTags] = useState<string[]>(initial);
   const [inputValue, setInputValue] = useState("");
-  const [cuisine, setCuisine] = useState("");
-  const [diet, setDiet] = useState("");
-  const [maxCookTime, setMaxCookTime] = useState(60);
-  const [servings, setServings] = useState(2);
+  const [isValidating, setIsValidating] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  function addIngredient() {
+  async function addTag() {
     const trimmed = inputValue.trim();
-    if (trimmed && !ingredients.includes(trimmed)) {
-      setIngredients([...ingredients, trimmed]);
+    if (!trimmed || tags.includes(trimmed)) {
+      setInputValue("");
+      return;
     }
-    setInputValue("");
+
+    setIsValidating(true);
+    setError(null);
+
+    try {
+      const response = await fetch("/api/validate-term", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ term: trimmed, category }),
+      });
+      const data = await response.json();
+
+      if (data.valid) {
+        setTags((prev) => [...prev, trimmed]);
+        setInputValue("");
+      } else {
+        setError(invalidMessage);
+      }
+    } catch {
+      // При сбое сети не блокируем пользователя — добавляем как есть.
+      setTags((prev) => [...prev, trimmed]);
+      setInputValue("");
+    } finally {
+      setIsValidating(false);
+    }
+  }
+
+  function removeTag(target: string) {
+    setTags((prev) => prev.filter((item) => item !== target));
   }
 
   function handleKeyDown(e: KeyboardEvent<HTMLInputElement>) {
     if (e.key === "Enter" || e.key === ",") {
       e.preventDefault();
-      addIngredient();
+      addTag();
     }
   }
 
-  function removeIngredient(target: string) {
-    setIngredients(ingredients.filter((item) => item !== target));
+  function handleInputChange(value: string) {
+    setInputValue(value);
+    if (error) setError(null);
   }
 
-  function handleSubmit(e: SubmitEvent<HTMLFormElement>) {
+  return {
+    tags,
+    inputValue,
+    setInputValue: handleInputChange,
+    addTag,
+    removeTag,
+    handleKeyDown,
+    isValidating,
+    error,
+  };
+}
+
+export default function IdeaForm({ onSubmit, isLoading }: IdeaFormProps) {
+  const t = useTranslations();
+
+  const ingredients = useTagInput("ingredient", t("invalidTermError"));
+  const cuisine = useTagInput("cuisine", t("invalidTermError"));
+  const diet = useTagInput("diet", t("invalidTermError"));
+  const [maxCookTime, setMaxCookTime] = useState(60);
+  const [servings, setServings] = useState(2);
+
+  function handleSubmit(e: FormEvent) {
     e.preventDefault();
-    if (ingredients.length === 0) return;
+    if (ingredients.tags.length === 0) return;
 
     onSubmit({
-      ingredients,
-      cuisine: cuisine || undefined,
-      diet: diet || undefined,
+      ingredients: ingredients.tags,
+      cuisine: cuisine.tags.length > 0 ? cuisine.tags : undefined,
+      diet: diet.tags.length > 0 ? diet.tags : undefined,
       maxCookTime,
       servings,
     });
   }
 
   return (
-    <form 
-    onSubmit={handleSubmit}
-    className="bg-paper-card rounded-2xl shadow-sm p-6 flex flex-col gap-5 border border-line"
+    <form
+      onSubmit={handleSubmit}
+      className="bg-paper-card rounded-2xl shadow-sm p-6 flex flex-col gap-5 border border-line"
     >
       <div>
         <label className="block text-sm font-medium text-ink mb-2">
@@ -63,33 +116,39 @@ export default function IdeaForm({ onSubmit, isLoading }: IdeaFormProps) {
         <div className="flex gap-2">
           <input
             type="text"
-            value={inputValue}
-            onChange={(e) => setInputValue(e.target.value)}
-            onKeyDown={handleKeyDown}
+            value={ingredients.inputValue}
+            onChange={(e) => ingredients.setInputValue(e.target.value)}
+            onKeyDown={ingredients.handleKeyDown}
             placeholder={t("ingredientsPlaceholder")}
-            className="flex-1 border border-line bg-paper rounded-lg px-3 py-2 text-sm text-ink placeholder:text-ink-soft/50 focus:outilne-none focus:ring-2 focus:ring-saffron"
+            disabled={ingredients.isValidating}
+            className="flex-1 border border-line bg-paper rounded-lg px-3 py-2 text-sm text-ink placeholder:text-ink-soft/50 focus:outline-none focus:ring-2 focus:ring-saffron disabled:opacity-60"
           />
           <button
             type="button"
-            onClick={addIngredient}
-            className="bg-ink text-paper px-4 py-2 rounded-lg text-sm hover:bg-ink/90 transition-colors"
+            onClick={ingredients.addTag}
+            disabled={ingredients.isValidating}
+            className="bg-ink text-paper px-4 py-2 rounded-lg text-sm hover:bg-ink/90 transition-colors disabled:opacity-60"
           >
-            {t("addButton")}
+            {ingredients.isValidating ? "⏳" : t("addButton")}
           </button>
         </div>
+        {ingredients.error && (
+          <p className="text-paprika text-xs mt-1.5">{ingredients.error}</p>
+        )}
 
-        {ingredients.length > 0 && (
+        {ingredients.tags.length > 0 && (
           <div className="flex flex-wrap gap-2 mt-3">
-            {ingredients.map((ingredient) => (
-              <span 
-                key={ingredient} 
-                className="bg-herb/10 text-herb text-sm px-3 py-1 rounded-full flex items-center gap-1.5 border border-herb/20">
-                {ingredient}
+            {ingredients.tags.map((tag) => (
+              <span
+                key={tag}
+                className="bg-herb/10 text-herb text-sm px-3 py-1 rounded-full flex items-center gap-1.5 border border-herb/20"
+              >
+                {tag}
                 <button
                   type="button"
-                  onClick={() => removeIngredient(ingredient)}
+                  onClick={() => ingredients.removeTag(tag)}
                   className="text-herb/70 hover:text-herb font-bold leading-none"
-                  aria-label={`Удалить ${ingredient}`}
+                  aria-label={tag}
                 >
                   ×
                 </button>
@@ -104,26 +163,96 @@ export default function IdeaForm({ onSubmit, isLoading }: IdeaFormProps) {
           <label className="block text-sm font-medium text-ink mb-1.5">
             {t("cuisineLabel")}
           </label>
-          <input
-            type="text"
-            value={cuisine}
-            onChange={(e) => setCuisine(e.target.value)}
-            placeholder={t("cuisinePlaceholder")}
-            className="w-full border border-line bg-paper rounded-lg px-3 py-2 text-sm text-ink placeholder:text-ink-soft/50 focus:oultine-none focus:ring-2 focus:ring-saffron"
-          />
+          <div className="flex gap-2">
+            <input
+              type="text"
+              value={cuisine.inputValue}
+              onChange={(e) => cuisine.setInputValue(e.target.value)}
+              onKeyDown={cuisine.handleKeyDown}
+              placeholder={t("cuisinePlaceholder")}
+              disabled={cuisine.isValidating}
+              className="flex-1 border border-line bg-paper rounded-lg px-3 py-2 text-sm text-ink placeholder:text-ink-soft/50 focus:outline-none focus:ring-2 focus:ring-saffron disabled:opacity-60"
+            />
+            <button
+              type="button"
+              onClick={cuisine.addTag}
+              disabled={cuisine.isValidating}
+              className="bg-ink text-paper px-3 rounded-lg text-sm hover:bg-ink/90 transition-colors disabled:opacity-60"
+            >
+              {cuisine.isValidating ? "⏳" : t("addButton")}
+            </button>
+          </div>
+          {cuisine.error && (
+            <p className="text-paprika text-xs mt-1.5">{cuisine.error}</p>
+          )}
+          {cuisine.tags.length > 0 && (
+            <div className="flex flex-wrap gap-2 mt-2">
+              {cuisine.tags.map((tag) => (
+                <span
+                  key={tag}
+                  className="bg-saffron/10 text-saffron text-sm px-3 py-1 rounded-full flex items-center gap-1.5 border border-saffron/20"
+                >
+                  {tag}
+                  <button
+                    type="button"
+                    onClick={() => cuisine.removeTag(tag)}
+                    className="text-saffron/70 hover:text-saffron font-bold leading-none"
+                    aria-label={tag}
+                  >
+                    ×
+                  </button>
+                </span>
+              ))}
+            </div>
+          )}
         </div>
 
         <div>
           <label className="block text-sm font-medium text-ink mb-1.5">
             {t("dietLabel")}
           </label>
-          <input
-            type="text"
-            value={diet}
-            onChange={(e) => setDiet(e.target.value)}
-            placeholder={t("dietPlaceholder")}
-            className="w-full border border-line bg-paper rounded-lg px-3 py-2 text-sm text-ink placeholder:text-ink-soft/50 focus:outline-none focus:ring-2 focus:ring-saffron"
-          />
+          <div className="flex gap-2">
+            <input
+              type="text"
+              value={diet.inputValue}
+              onChange={(e) => diet.setInputValue(e.target.value)}
+              onKeyDown={diet.handleKeyDown}
+              placeholder={t("dietPlaceholder")}
+              disabled={diet.isValidating}
+              className="flex-1 border border-line bg-paper rounded-lg px-3 py-2 text-sm text-ink placeholder:text-ink-soft/50 focus:outline-none focus:ring-2 focus:ring-saffron disabled:opacity-60"
+            />
+            <button
+              type="button"
+              onClick={diet.addTag}
+              disabled={diet.isValidating}
+              className="bg-ink text-paper px-3 rounded-lg text-sm hover:bg-ink/90 transition-colors disabled:opacity-60"
+            >
+              {diet.isValidating ? "⏳" : t("addButton")}
+            </button>
+          </div>
+          {diet.error && (
+            <p className="text-paprika text-xs mt-1.5">{diet.error}</p>
+          )}
+          {diet.tags.length > 0 && (
+            <div className="flex flex-wrap gap-2 mt-2">
+              {diet.tags.map((tag) => (
+                <span
+                  key={tag}
+                  className="bg-paprika/10 text-paprika text-sm px-3 py-1 rounded-full flex items-center gap-1.5 border border-paprika/20"
+                >
+                  {tag}
+                  <button
+                    type="button"
+                    onClick={() => diet.removeTag(tag)}
+                    className="text-paprika/70 hover:text-paprika font-bold leading-none"
+                    aria-label={tag}
+                  >
+                    ×
+                  </button>
+                </span>
+              ))}
+            </div>
+          )}
         </div>
 
         <div>
@@ -137,7 +266,7 @@ export default function IdeaForm({ onSubmit, isLoading }: IdeaFormProps) {
             step={5}
             value={maxCookTime}
             onChange={(e) => setMaxCookTime(Number(e.target.value))}
-            className="w-full accent-orange-500"
+            className="w-full accent-saffron"
           />
         </div>
 
@@ -151,14 +280,14 @@ export default function IdeaForm({ onSubmit, isLoading }: IdeaFormProps) {
             max={8}
             value={servings}
             onChange={(e) => setServings(Number(e.target.value))}
-            className="w-full accent-orange-500"
+            className="w-full accent-saffron"
           />
         </div>
       </div>
 
       <button
         type="submit"
-        disabled={ingredients.length === 0 || isLoading}
+        disabled={ingredients.tags.length === 0 || isLoading}
         className="bg-saffron text-paper font-medium py-3 rounded-lg hover:bg-saffron/90 transition-colors disabled:bg-line disabled:text-ink-soft disabled:cursor-not-allowed"
       >
         {isLoading ? t("submitLoading") : t("submitButton")}

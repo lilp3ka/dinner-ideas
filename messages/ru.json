@@ -24,5 +24,6 @@
   "servingsWord": "порции",
   "caloriesShort": "ккал",
   "addFavoriteLabel": "Добавить в избранное",
-  "removeFavoriteLabel": "Убрать из избранного"
+  "removeFavoriteLabel": "Убрать из избранного",
+  "invalidTermError": "Не похоже на реальный вариант, попробуйте другое слово"
 }
