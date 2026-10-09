@@ -13,6 +13,7 @@ import {
   getDishId,
   type FavoriteDish,
 } from "@/lib/favorites";
+import { addHistoryEntry } from "@/lib/history";
 
 export default function Home() {
   const t = useTranslations();
@@ -49,6 +50,7 @@ export default function Home() {
       }
 
       setDishes(data.dishes);
+      addHistoryEntry(data.dishes, params);
     } catch (err) {
       const message = err instanceof Error ? err.message : "Error";
       setError(message);

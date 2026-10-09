@@ -30,5 +30,11 @@
   "shoppingListTitle": "Список покупок",
   "shoppingListEmpty": "Список покупок пуст. Добавляйте ингредиенты прямо с карточек блюд.",
   "clearChecked": "Убрать купленное",
-  "clearAll": "Очистить список"
+  "clearAll": "Очистить список",
+  "allergensLabel": "Аллергии (необязательно)",
+  "allergensPlaceholder": "Орехи, морепродукты...",
+  "historyTitle": "История",
+  "historyEmpty": "Пока нет сохранённых генераций. Сгенерируйте идеи ужина — они появятся здесь.",
+  "historyClearAll": "Очистить историю",
+  "historyRestoreParams": "Использованные продукты"
 }

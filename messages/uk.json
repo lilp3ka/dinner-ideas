@@ -30,5 +30,11 @@
   "shoppingListTitle": "Список покупок",
   "shoppingListEmpty": "Список покупок порожній. Додавайте інгредієнти прямо з карток страв.",
   "clearChecked": "Прибрати куплене",
-  "clearAll": "Очистити список"
+  "clearAll": "Очистити список",
+  "allergensLabel": "Алергії (необов'язково)",
+  "allergensPlaceholder": "Горіхи, морепродукти...",
+  "historyTitle": "Історія",
+  "historyEmpty": "Поки немає збережених генерацій. Згенеруйте ідеї вечері — вони з'являться тут.",
+  "historyClearAll": "Очистити історію",
+  "historyRestoreParams": "Використані продукти"
 }

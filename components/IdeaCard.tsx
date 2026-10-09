@@ -1,9 +1,16 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import { useTranslations } from "next-intl";
-import { useState } from "react";
 import type { Dish } from "@/lib/prompt";
 import { addIngredientsToShoppingList } from "@/lib/shoppingList";
+
+interface DishImage {
+  url: string;
+  alt: string;
+  photographerName: string;
+  photographerUrl: string;
+}
 
 interface IdeaCardProps {
   dish: Dish;
@@ -18,6 +25,25 @@ export default function IdeaCard({
 }: IdeaCardProps) {
   const t = useTranslations();
   const [justAdded, setJustAdded] = useState(false);
+
+  const [image, setImage] = useState<DishImage | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    fetch(`/api/dish-image?query=${encodeURIComponent(dish.title)}`)
+      .then((res) => res.json())
+      .then((data) => {
+        if (!cancelled && data.image) {
+          setImage(data.image);
+        }
+      })
+      .catch(() => {});
+
+    return () => {
+      cancelled = true;
+    };
+  }, [dish.title]);
 
   function handleAddToShoppingList() {
     addIngredientsToShoppingList(dish.ingredients);
@@ -36,7 +62,25 @@ export default function IdeaCard({
 
   return (
     <div className="bg-paper-card rounded-xl border border-line overflow-hidden flex flex-col">
-      <div className="h-1.5 bg-paprika" />
+      {image ? (
+        <div className="relative">
+          <img
+            src={image.url}
+            alt={image.alt}
+            className="w-full h-40 object-cover"
+          />
+          <a
+            href={image.photographerUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="absolute bottom-1 left-1.5 right-1.5 text-[10px] text-white/80 bg-ink/40 px-1.5 py-0.5 rounded truncate"
+          >
+            📷 {image.photographerName}
+          </a>
+        </div>
+      ) : (
+        <div className="h-1.5 bg-paprika" />
+      )}
 
       <div className="p-6 flex flex-col gap-4">
         <div className="flex items-start justify-between gap-3">

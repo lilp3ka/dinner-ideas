@@ -88,6 +88,7 @@ export default function IdeaForm({ onSubmit, isLoading }: IdeaFormProps) {
   const ingredients = useTagInput("ingredient", t("invalidTermError"));
   const cuisine = useTagInput("cuisine", t("invalidTermError"));
   const diet = useTagInput("diet", t("invalidTermError"));
+  const allergens = useTagInput("ingredient", t("invalidTermError"));
   const [maxCookTime, setMaxCookTime] = useState(60);
   const [servings, setServings] = useState(2);
 
@@ -99,6 +100,7 @@ export default function IdeaForm({ onSubmit, isLoading }: IdeaFormProps) {
       ingredients: ingredients.tags,
       cuisine: cuisine.tags.length > 0 ? cuisine.tags : undefined,
       diet: diet.tags.length > 0 ? diet.tags : undefined,
+      allergens: allergens.tags.length > 0 ? allergens.tags : undefined,
       maxCookTime,
       servings,
     });
@@ -245,6 +247,54 @@ export default function IdeaForm({ onSubmit, isLoading }: IdeaFormProps) {
                     type="button"
                     onClick={() => diet.removeTag(tag)}
                     className="text-paprika/70 hover:text-paprika font-bold leading-none"
+                    aria-label={tag}
+                  >
+                    ×
+                  </button>
+                </span>
+              ))}
+            </div>
+          )}
+        </div>
+
+        <div className="col-span-2">
+          <label className="block text-sm font-medium text-ink mb-1.5">
+            {t("allergensLabel")}
+          </label>
+          <div className="flex gap-2">
+            <input
+              type="text"
+              value={allergens.inputValue}
+              onChange={(e) => allergens.setInputValue(e.target.value)}
+              onKeyDown={allergens.handleKeyDown}
+              placeholder={t("allergensPlaceholder")}
+              disabled={allergens.isValidating}
+              className="flex-1 border border-line bg-paper rounded-lg px-3 py-2 text-sm text-ink placeholder:text-ink-soft/50 focus:outline-none focus:ring-2 focus:ring-saffron disabled:opacity-60"
+            />
+            <button
+              type="button"
+              onClick={allergens.addTag}
+              disabled={allergens.isValidating}
+              className="bg-ink text-paper px-3 rounded-lg text-sm hover:bg-ink/90 transition-colors disabled:opacity-60"
+            >
+              {allergens.isValidating ? "⏳" : t("addButton")}
+            </button>
+          </div>
+          {allergens.error && (
+            <p className="text-paprika text-xs mt-1.5">{allergens.error}</p>
+          )}
+          {allergens.tags.length > 0 && (
+            <div className="flex flex-wrap gap-2 mt-2">
+              {allergens.tags.map((tag) => (
+                <span
+                  key={tag}
+                  className="bg-paprika/20 text-paprika text-sm px-3 py-1 rounded-full flex items-center gap-1.5 border border-paprika/40"
+                >
+                  ⚠️ {tag}
+                  <button
+                    type="button"
+                    onClick={() => allergens.removeTag(tag)}
+                    className="text-paprika/80 hover:text-paprika font-bold leading-none"
                     aria-label={tag}
                   >
                     ×

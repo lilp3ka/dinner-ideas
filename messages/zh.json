@@ -30,5 +30,11 @@
   "shoppingListTitle": "购物清单",
   "shoppingListEmpty": "购物清单是空的。可以直接从菜品卡片添加食材。",
   "clearChecked": "清除已购买",
-  "clearAll": "清空清单"
+  "clearAll": "清空清单",
+  "allergensLabel": "过敏原（可选）",
+  "allergensPlaceholder": "坚果、海鲜...",
+  "historyTitle": "历史记录",
+  "historyEmpty": "还没有保存的生成记录。生成晚餐灵感后会显示在这里。",
+  "historyClearAll": "清除历史记录",
+  "historyRestoreParams": "使用的食材"
 }

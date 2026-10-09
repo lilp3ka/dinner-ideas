@@ -30,5 +30,11 @@
   "shoppingListTitle": "Shopping List",
   "shoppingListEmpty": "Your shopping list is empty. Add ingredients right from dish cards.",
   "clearChecked": "Clear checked",
-  "clearAll": "Clear list"
+  "clearAll": "Clear list",
+  "allergensLabel": "Allergies (optional)",
+  "allergensPlaceholder": "Nuts, shellfish...",
+  "historyTitle": "History",
+  "historyEmpty": "No saved generations yet. Generate dinner ideas — they'll show up here.",
+  "historyClearAll": "Clear history",
+  "historyRestoreParams": "Ingredients used"
 }

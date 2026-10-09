@@ -30,5 +30,11 @@
   "shoppingListTitle": "買い物リスト",
   "shoppingListEmpty": "買い物リストは空です。レシピカードから材料を追加できます。",
   "clearChecked": "購入済みを削除",
-  "clearAll": "リストを空にする"
+  "clearAll": "リストを空にする",
+  "allergensLabel": "アレルギー（任意）",
+  "allergensPlaceholder": "ナッツ、魚介類...",
+  "historyTitle": "履歴",
+  "historyEmpty": "まだ保存された生成履歴はありません。夕食のアイデアを生成すると、ここに表示されます。",
+  "historyClearAll": "履歴を削除",
+  "historyRestoreParams": "使用した食材"
 }

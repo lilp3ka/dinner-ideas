@@ -20,18 +20,27 @@ export type IdeasResponse = z.infer<typeof IdeasResponseSchema>;
 
 export interface IdeaRequestParams {
   ingredients: string[];
-  cuisine?: string;
-  diet?: string;
+  cuisine?: string[];
+  diet?: string[];
+  allergens?: string[];
   maxCookTime?: number;
   servings?: number;
   language?: string;
 }
 
 export function buildPrompt(params: IdeaRequestParams): string {
-  const { ingredients, cuisine, diet, maxCookTime, servings, language } = params;
+  const {
+    ingredients,
+    cuisine,
+    diet,
+    allergens,
+    maxCookTime,
+    servings,
+    language,
+  } = params;
 
   const languageNames: Record<string, string> = {
-    ru: "руском",
+    ru: "русском",
     uk: "украинском",
     en: "английском",
     zh: "китайском",
@@ -40,13 +49,22 @@ export function buildPrompt(params: IdeaRequestParams): string {
   const languageName = languageNames[language ?? "ru"] ?? "русском";
 
   const constraints: string[] = [];
-  if (cuisine) constraints.push(`Кухня: ${cuisine}.`);
-  if (diet) constraints.push(`Диетичекие ограничения: ${diet}.`);
+  if (cuisine && cuisine.length > 0)
+    constraints.push(`Кухня: ${cuisine.join(", ")}.`);
+  if (diet && diet.length > 0)
+    constraints.push(`Диетические ограничения: ${diet.join(", ")}.`);
+  if (allergens && allergens.length > 0) {
+    constraints.push(
+      `ВАЖНО, это ограничение по здоровью: исключи из рецептов полностью следующие продукты и всё, что их содержит: ${allergens.join(", ")}. Не предлагай блюда с этими продуктами ни в каком виде.`,
+    );
+  }
   if (maxCookTime)
-    constraints.push(`Время готовки не больше: ${maxCookTime} минут.`);
-  if (servings) constraints.push(`Количество порций: ${servings}.`);
+    constraints.push(`Время готовки не больше ${maxCookTime} минут.`);
+  if (servings) constraints.push(`Число порций: ${servings}.`);
 
   return `Ты — кулинарный помощник. Придумай 3 разных варианта ужина на основе списка продуктов, которые есть у пользователя. Весь текст в ответе — названия блюд, описания, названия ингредиентов и шаги приготовления — напиши на ${languageName} языке, независимо от того, на каком языке дан список продуктов ниже.
+
+Шаги приготовления должны быть подробными, как в хорошей кулинарной книге, а не общими фразами. Для каждого шага указывай конкретику: точную температуру (градусы, или словами вроде "средний огонь", "сильный огонь"), точное время этого конкретного этапа в минутах или секундах, и визуальный или тактильный признак готовности этого шага (например, "пока лук не станет золотистым", "пока мясо не побелеет со всех сторон"). Дроби крупные действия на отдельные шаги вместо того, чтобы объединять несколько действий в один пункт. Обычно это означает 5-8 шагов вместо 3-4, но ориентируйся на реальную сложность рецепта, а не на фиксированное число.
 
   Доступные продукты: ${ingredients.join(", ")}.
   ${constraints.join(" ")}
