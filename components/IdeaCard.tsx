@@ -1,7 +1,9 @@
 "use client";
 
 import { useTranslations } from "next-intl";
+import { useState } from "react";
 import type { Dish } from "@/lib/prompt";
+import { addIngredientsToShoppingList } from "@/lib/shoppingList";
 
 interface IdeaCardProps {
   dish: Dish;
@@ -9,8 +11,19 @@ interface IdeaCardProps {
   onToggleFavorite: () => void;
 }
 
-export default function IdeaCard({ dish, isFavorite, onToggleFavorite }: IdeaCardProps) {
+export default function IdeaCard({
+  dish,
+  isFavorite,
+  onToggleFavorite,
+}: IdeaCardProps) {
   const t = useTranslations();
+  const [justAdded, setJustAdded] = useState(false);
+
+  function handleAddToShoppingList() {
+    addIngredientsToShoppingList(dish.ingredients);
+    setJustAdded(true);
+    setTimeout(() => setJustAdded(false), 1500);
+  }
 
   const meta = [
     `${dish.cookTimeMinutes} ${t("minutesShort")}`,
@@ -37,7 +50,9 @@ export default function IdeaCard({ dish, isFavorite, onToggleFavorite }: IdeaCar
           <button
             type="button"
             onClick={onToggleFavorite}
-            aria-label={isFavorite ? t("removeFavoriteLabel") : t("addFavoriteLabel")}
+            aria-label={
+              isFavorite ? t("removeFavoriteLabel") : t("addFavoriteLabel")
+            }
             className="flex-shrink-0 text-xl leading-none mt-1 transition-transform hover:scale-110"
           >
             {isFavorite ? "❤️" : "🤍"}
@@ -49,14 +64,29 @@ export default function IdeaCard({ dish, isFavorite, onToggleFavorite }: IdeaCar
         </p>
 
         <div className="border-t border-line pt-4">
-          <h4 className="font-medium text-ink text-sm mb-2">{t("ingredientsSectionTitle")}</h4>
+          <div className="flex items-center justify-between gap-2 mb-2">
+            <h4 className="font-medium text-ink text-sm">
+              {t("ingredientsSectionTitle")}
+            </h4>
+            <button
+              type="button"
+              onClick={handleAddToShoppingList}
+              className="text-xs text-saffron hover:text-saffron/80 flex items-center gap-1 whitespace-nowrap"
+            >
+              {justAdded
+                ? `✓ ${t("addToShoppingList")}`
+                : `🛒 ${t("addToShoppingList")}`}
+            </button>
+          </div>
           <p className="text-sm text-ink-soft leading-relaxed">
             {dish.ingredients.join(", ")}
           </p>
         </div>
 
         <div className="border-t border-line pt-4">
-          <h4 className="font-medium text-ink text-sm mb-2">{t("stepsSectionTitle")}</h4>
+          <h4 className="font-medium text-ink text-sm mb-2">
+            {t("stepsSectionTitle")}
+          </h4>
           <ol className="space-y-2.5">
             {dish.steps.map((step, i) => (
               <li key={i} className="text-sm text-ink-soft flex gap-3">

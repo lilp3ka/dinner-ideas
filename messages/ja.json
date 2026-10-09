@@ -25,5 +25,10 @@
   "caloriesShort": "kcal",
   "addFavoriteLabel": "お気に入りに追加",
   "removeFavoriteLabel": "お気に入りから削除",
-  "invalidTermError": "実在するものではないようです。別の言葉をお試しください"
+  "invalidTermError": "実在するものではないようです。別の言葉をお試しください",
+  "addToShoppingList": "買い物リストに追加",
+  "shoppingListTitle": "買い物リスト",
+  "shoppingListEmpty": "買い物リストは空です。レシピカードから材料を追加できます。",
+  "clearChecked": "購入済みを削除",
+  "clearAll": "リストを空にする"
 }

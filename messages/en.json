@@ -25,5 +25,10 @@
   "caloriesShort": "kcal",
   "addFavoriteLabel": "Add to favorites",
   "removeFavoriteLabel": "Remove from favorites",
-  "invalidTermError": "Doesn't look like a real option, try another word"
+  "invalidTermError": "Doesn't look like a real option, try another word",
+  "addToShoppingList": "Add to shopping list",
+  "shoppingListTitle": "Shopping List",
+  "shoppingListEmpty": "Your shopping list is empty. Add ingredients right from dish cards.",
+  "clearChecked": "Clear checked",
+  "clearAll": "Clear list"
 }

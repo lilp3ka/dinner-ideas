@@ -25,5 +25,10 @@
   "caloriesShort": "千卡",
   "addFavoriteLabel": "加入收藏",
   "removeFavoriteLabel": "取消收藏",
-  "invalidTermError": "这似乎不是一个真实的选项，请换个词试试"
+  "invalidTermError": "这似乎不是一个真实的选项，请换个词试试",
+  "addToShoppingList": "加入购物清单",
+  "shoppingListTitle": "购物清单",
+  "shoppingListEmpty": "购物清单是空的。可以直接从菜品卡片添加食材。",
+  "clearChecked": "清除已购买",
+  "clearAll": "清空清单"
 }

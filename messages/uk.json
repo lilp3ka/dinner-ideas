@@ -25,5 +25,10 @@
   "caloriesShort": "ккал",
   "addFavoriteLabel": "Додати в обране",
   "removeFavoriteLabel": "Прибрати з обраного",
-  "invalidTermError": "Не схоже на реальний варіант, спробуйте інше слово"
+  "invalidTermError": "Не схоже на реальний варіант, спробуйте інше слово",
+  "addToShoppingList": "До списку покупок",
+  "shoppingListTitle": "Список покупок",
+  "shoppingListEmpty": "Список покупок порожній. Додавайте інгредієнти прямо з карток страв.",
+  "clearChecked": "Прибрати куплене",
+  "clearAll": "Очистити список"
 }

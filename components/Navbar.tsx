@@ -36,6 +36,13 @@ export default function Navbar({ favoritesCount }: NavbarProps) {
             {favoritesCount > 0 && ` (${favoritesCount})`}
           </Link>
 
+          <Link
+            href="/shopping-list"
+            className="text-sm text-ink-soft hover:text-ink flex items-center gap-1.5"
+          >
+            🛒 {t("shoppingListTitle")}
+          </Link>
+
           <select
             value={locale}
             onChange={(e) => handleLanguageChange(e.target.value)}
